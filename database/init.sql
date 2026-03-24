@@ -46,11 +46,11 @@ Select id,name from countries order by population Desc LIMIT 1;
 --2. Top 10 countries with the lowest population density (names of the countries)
 select name from countries order by (population/area_km2) Limit (10);
 
---3. Countries with population density higher than average
+--3. Countries with population density higher than average across all countries
 select name from countries where(population/area_km2) >
                                 (select avg(countries.population/countries.area_km2) from countries);
 
--- 4. Country with the longest name (show all if tie)
+-- 4. Country with the longest name (if several countries have name of the same length, show all of them)
 SELECT name
 FROM countries
 WHERE LENGTH(name) = (
@@ -58,19 +58,19 @@ WHERE LENGTH(name) = (
     FROM countries
 );
 
--- 5. All countries with name containing letter "F", sorted alphabetically
+-- 5. All countries with name containing letter “F”, sorted in alphabetical order
 SELECT name
 FROM countries
 WHERE name ILIKE '%f%'
 ORDER BY name ASC;
 
--- 6. Country with population closest to the average population
+-- 6. Country which has a population, closest to the average population of all countries
 SELECT id, name, population
 FROM countries
 ORDER BY ABS(population - (SELECT AVG(population) FROM countries)) ASC
     LIMIT 1;
 
---Section 2 — Countries & Continents Queries
+--Write SQL queries to find the following data about countries and continents:
 -- 1. Count of countries for each continent
 SELECT co.name AS continent, COUNT(c.id) AS country_count
 FROM continents co
@@ -78,7 +78,7 @@ FROM continents co
 GROUP BY co.name
 ORDER BY country_count DESC;
 
--- 2. Total area for each continent, sorted biggest to smallest
+-- 2. Total area for each continent (print continent name and total area), sorted by area from biggest to smallest
 SELECT co.name AS continent, SUM(c.area_km2) AS total_area
 FROM continents co
          JOIN countries c ON c.continent_id = co.id
@@ -93,7 +93,7 @@ FROM continents co
 GROUP BY co.name
 ORDER BY avg_density DESC;
 
--- 4. For each continent, find country with the smallest area
+-- 4. For each continent, find a country with the smallest area (print continent name, country name and area)
 SELECT co.name AS continent, c.name AS country, c.area_km2
 FROM countries c
          JOIN continents co ON co.id = c.continent_id
@@ -104,7 +104,7 @@ WHERE c.area_km2 = (
 )
 ORDER BY co.name;
 
--- 5. Continents where average country population is less than 20 million
+-- 5. Find all continents, which have average country population less than 20 million
 SELECT co.name AS continent,
        ROUND(AVG(c.population), 0) AS avg_population
 FROM continents co
@@ -114,7 +114,7 @@ HAVING AVG(c.population) < 20000000
 ORDER BY avg_population ASC;
 
 
---Section 3 — People Queries
+--Section 5 Write SQL queries to find the following data about people
 -- 1. Person with the biggest number of citizenships
 SELECT p.id, p.first_name, p.last_name, COUNT(pc.country_id) AS citizenship_count
 FROM people p
@@ -146,7 +146,7 @@ GROUP BY co.name
 ORDER BY people_count DESC
     LIMIT 1;
 
--- 5. Pairs of people with the same first name (print 2 ids and the name)
+-- 5. Find pairs of people with the same name - print 2 ids and the name
 SELECT p1.id AS person1_id, p2.id AS person2_id, p1.first_name AS name
 FROM people p1
          JOIN people p2 ON p1.first_name = p2.first_name
